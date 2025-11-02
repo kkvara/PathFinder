@@ -1,0 +1,31 @@
+[
+  {
+    "id": 1,
+    "title": "Ingegneria Aerospaziale",
+    "imageName": "aerospace",     /* nome immagine da mettere negli Assets */
+    "order": 1,
+    "summary": "Studio dei velivoli, dei sistemi spaziali e delle tecnologie aerospaziali."
+  },
+  {
+    "id": 2,
+    "title": "Design",
+    "imageName": "design",
+    "order": 2,
+    "summary": "Percorso creativo che combina estetica, usabilità e progettazione."
+  },
+  {
+    "id": 3,
+    "title": "Giurisprudenza",
+    "imageName": "law",
+    "order": 3,
+    "summary": "Formazione giuridica con focus su diritto civile, penale e processuale."
+  },
+  {
+    "id": 4,
+    "title": "Medicina",
+    "imageName": "medicine",
+    "order": 4,
+    "summary": "Percorso sanitario incentrato su anatomia, cura e pratica clinica."
+  }
+]
+
