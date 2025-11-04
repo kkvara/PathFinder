@@ -58,7 +58,7 @@ struct HomeWGame: View {
                     .padding(.top, 20)    // distanza dal bordo superiore riferito all'HStack
                     
                     //MARK: ---------- SEZIONE PERCORSI ----------
-                    ScrollView {
+                    ScrollView (.horizontal) {
                         VStack(spacing: 20) {
                             ForEach(pathData.paths) { path in
                                 // Ogni card è un image button cliccabile che porta alla schermata del percorso
