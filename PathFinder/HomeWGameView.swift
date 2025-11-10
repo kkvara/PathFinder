@@ -1,43 +1,51 @@
-// MARK: Home screen when the user has run the game
 import Foundation
 import SwiftUI
 
 struct HomeWGameView: View {
-    // MARK: - ViewModel dei percorsi (uso dati da struct PathModel)
-
     @State private var showFullLeaderboard = false
 
-    var sortedPaths: [Path] {
-        pathsData.sorted { lhs, rhs in
-            if lhs.played == rhs.played {
+    // Funzione di supporto: determina se una recensione è positiva (semplice filtro)
+    private func isPositiveReview(_ text: String) -> Bool {
+        let positiveKeywords = ["good", "great", "excellent", "ottimo", "preparato", "positivo", "soddisfacente"]
+        let lowercased = text.lowercased()
+        return positiveKeywords.contains(where: lowercased.contains)
+    }
+
+    // Calcola la percentuale di feedback positivi per un corso
+    private func positiveFeedbackPercentage(for course: Course) -> Double {
+        guard !course.reviews.isEmpty else { return 0.0 }
+        let positiveCount = course.reviews.filter { isPositiveReview($0.text) }.count
+        return (Double(positiveCount) / Double(course.reviews.count)) * 100
+    }
+
+    // Ottiene tutti i corsi da tutte le categorie
+    private var allCourses: [Course] {
+        categoriesData.flatMap { $0.courses }
+    }
+
+    // Leaderboard ordinata per feedback positivi decrescenti
+    private var leaderboardByFeedback: [(course: Course, positivePercent: Double)] {
+        allCourses.map { course in
+            (course: course, positivePercent: positiveFeedbackPercentage(for: course))
+        }
+        .sorted { $0.positivePercent > $1.positivePercent }
+    }
+
+    // Corsie ordinate per played della categoria e nome del corso
+    private var sortedCourses: [Course] {
+        allCourses.sorted { lhs, rhs in
+            // Trova se la categoria è played
+            let lhsPlayed = categoriesData.first(where: { $0.courses.contains(where: { $0.id == lhs.id }) })?.played ?? false
+            let rhsPlayed = categoriesData.first(where: { $0.courses.contains(where: { $0.id == rhs.id }) })?.played ?? false
+            
+            if lhsPlayed == rhsPlayed {
                 return lhs.name < rhs.name
             }
-            return lhs.played && !rhs.played
+            return lhsPlayed && !rhsPlayed
         }
     }
 
-    // Top 3 del leaderboard (per visualizzazione iniziale)
-    var top3LeaderboardEntries: [(String, String, String)] = [
-        ("1", "Medicina", "95% feedback positivi"),
-        ("2", "Ingegneria Aerospaziale", "92% feedback positivi"),
-        ("3", "Informatica", "89% feedback positivi")
-    ]
-
-    // Lista completa per espansione
-    var fullLeaderboardEntries: [(String, String, String)] = [
-        ("1", "Medicina", "95% feedback positivi"),
-        ("2", "Ingegneria Aerospaziale", "92% feedback positivi"),
-        ("3", "Informatica", "89% feedback positivi"),
-        ("4", "Giurisprudenza", "85% feedback positivi"),
-        ("5", "Economia", "82% feedback positivi"),
-        ("6", "Architettura", "80% feedback positivi"),
-        ("7", "Psicologia", "78% feedback positivi"),
-        ("8", "Biologia", "75% feedback positivi")
-    ]
-
     var body: some View {
-        TabView {
-            // MARK: --- Home Tab ---
             NavigationStack {
                 ZStack {
                     AppTheme.backgroundGradient
@@ -45,11 +53,17 @@ struct HomeWGameView: View {
 
                     ScrollView {
                         VStack(spacing: 20) {
-                            // Header con bottone destra immagine personalizzata
-                            HStack(alignment: .top) {
+                            HStack(alignment: .center) {
+                                Text("PATH FINDER")
+                                    .font(.system(size: 34, weight: .heavy, design: .rounded))
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.leading, 24)
+                                    .shadow(color: Color.black.opacity(0.25), radius: 4, x: 0, y: 2)
+
                                 Spacer()
-                                Spacer()
-                                Button(action: { }) {
+
+                                NavigationLink(destination: CrystalBallView()) {
                                     Image("Crystal_Ball_white")
                                         .resizable()
                                         .scaledToFit()
@@ -60,11 +74,10 @@ struct HomeWGameView: View {
                                                 .fill(Color.white.opacity(0.15))
                                         )
                                 }
+                                .padding(.trailing, 24)
                             }
-                            .padding(.horizontal)
-                            .padding(.top, 20)
+                            .padding(.vertical, 10)
 
-                            // Titolo sopra la scrollView dei percorsi
                             Text("Recommended Paths For You")
                                 .font(.title2)
                                 .fontWeight(.bold)
@@ -72,13 +85,10 @@ struct HomeWGameView: View {
                                 .padding(.horizontal)
                                 .frame(maxWidth: .infinity, alignment: .leading)
 
-                            // Scroll orizzontale percorsi
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 20) {
-                                    ForEach(sortedPaths) { path in
-                                        Button(action: {
-                                            print("Hai cliccato su \(path.name)")
-                                        }) {
+                                    ForEach(sortedCourses) { course in
+                                        NavigationLink(destination: CourseDetailView()) {
                                             ZStack(alignment: .bottomLeading) {
                                                 Rectangle()
                                                     .fill(Color.blue.opacity(0.6))
@@ -88,10 +98,11 @@ struct HomeWGameView: View {
                                                 LinearGradient(
                                                     gradient: Gradient(colors: [Color.black.opacity(0.6), Color.clear]),
                                                     startPoint: .bottom,
-                                                    endPoint: .center)
-                                                    .cornerRadius(15)
+                                                    endPoint: .center
+                                                )
+                                                .cornerRadius(15)
 
-                                                Text(path.name)
+                                                Text(course.name)
                                                     .font(.headline)
                                                     .bold()
                                                     .foregroundColor(.white)
@@ -104,14 +115,12 @@ struct HomeWGameView: View {
                                     }
                                 }
                                 .padding(.top, 30)
+                                .padding(.horizontal)
                             }
 
-                            // Pulsante List of Dipartimento grande senza sfondo pieno
-                            Button(action: {
-                                print("Tasto 'List of Dipartiments' premuto")
-                            }) {
+                            NavigationLink(destination: DepartmentsView()) {
                                 VStack(alignment: .leading, spacing: 6) {
-                                    Text("List of Dipartiments")
+                                    Text("List of Departments")
                                         .font(.system(size: 28, weight: .heavy, design: .rounded))
                                         .foregroundColor(.white)
                                     Text("Esplora tutti i dipartimenti disponibili e scopri il percorso giusto per te")
@@ -127,7 +136,6 @@ struct HomeWGameView: View {
                                 .padding(.horizontal)
                             }
 
-                            // MARK: Classifica Top 3 (grande) con possibilità di espansione
                             VStack(alignment: .leading, spacing: 14) {
                                 Text("Classifica dei Percorsi")
                                     .font(.title2)
@@ -135,34 +143,29 @@ struct HomeWGameView: View {
                                     .foregroundColor(.white)
                                     .padding(.bottom, 8)
 
-                                // Mostra solo top 3 o tutta la lista a seconda dello stato
-                                ForEach(showFullLeaderboard ? fullLeaderboardEntries : top3LeaderboardEntries, id: \.0) { entry in
+                                ForEach(showFullLeaderboard ? leaderboardByFeedback : Array(leaderboardByFeedback.prefix(3)), id: \.course.id) { entry in
                                     HStack(spacing: 8) {
-                                        // Icona numerica dentro cerchio azzurro
                                         ZStack {
                                             Circle()
                                                 .fill(Color.blue.opacity(0.8))
                                                 .frame(width: 28, height: 28)
-                                            Text(entry.0)
+                                            Text("\(leaderboardByFeedback.firstIndex(where: { $0.course.id == entry.course.id })! + 1)")
                                                 .font(.subheadline)
                                                 .fontWeight(.bold)
                                                 .foregroundColor(.white)
                                         }
-                                        // Titolo percorso
-                                        Text(entry.1)
+                                        Text(entry.course.name)
                                             .foregroundColor(.white)
                                             .font(.system(.body, design: .rounded))
                                             .bold()
                                         Spacer()
-                                        // Percentuale feedback
-                                        Text(entry.2)
+                                        Text(String(format: "%.0f%% feedback positivi", entry.positivePercent))
                                             .foregroundColor(.white.opacity(0.8))
                                             .font(.system(.body, design: .rounded))
                                     }
                                     .padding(.vertical, 4)
                                 }
 
-                                // Pulsante per espandere o ridurre la classifica
                                 Button(action: {
                                     withAnimation {
                                         showFullLeaderboard.toggle()
@@ -182,34 +185,10 @@ struct HomeWGameView: View {
                     }
                 }
             }
-            .tabItem {
-                Image(systemName: "house.fill")
-                Text("Home")
-            }
 
-            // MARK: --- News Tab ---
-            Text("News content here")
-                .tabItem {
-                    Image(systemName: "newspaper.fill")
-                    Text("News")
-                }
-
-            // MARK: --- Likes Tab ---
-            Text("Likes content here")
-                .tabItem {
-                    Image(systemName: "star.fill")
-                    Text("Likes")
-                }
-
-            // MARK: --- Search Tab ---
-            Text("Search content here")
-                .tabItem {
-                    Image(systemName: "magnifyingglass")
-                    Text("Search")
-                }
         }
     }
-}
+
 
 #Preview {
     HomeWGameView()

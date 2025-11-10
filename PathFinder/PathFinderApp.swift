@@ -11,7 +11,7 @@ import SwiftUI
 struct PathFinderApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            AppTabContainer()
         }
     }
 }

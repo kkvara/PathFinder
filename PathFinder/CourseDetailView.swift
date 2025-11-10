@@ -1,6 +1,7 @@
 import SwiftUI
  
 struct CourseDetailView: View {
+
     var body: some View {
         ZStack {
             // Sfondo gradiente blu → celeste

@@ -1,145 +1,153 @@
-
+//
+// Single file containing all views (Menu, Quiz, Results) for the orientation flow.
+// This view assumes it is pushed/presented by another view (HomeWGameView) and uses
+// the @Environment(\.dismiss) to return to the parent when the quiz is complete.
+//
 import SwiftUI
+import Foundation
+import Combine
 
-// MARK: - Modello Dati per la Domanda
+
+// MARK: - Data Models
+
+/// Defines the four career categories.
+enum Career: String, CaseIterable, Identifiable {
+    case engineering = "Engineering"
+    case architecture = "Architecture"
+    case medicine = "Medicine"
+    case law = "Law School"
+
+    var id: String { rawValue }
+}
+
+typealias ScoreDelta = [Career: Int]
+
 struct Question: Identifiable {
     let id = UUID()
     let text: String
+    let scoreIfYes: ScoreDelta
+    let scoreIfNo: ScoreDelta
 }
 
-// MARK: - Vista Fittizia per il Tab Bar Item
-struct TabBarItemView: View {
-    let iconName: String
-    let title: String
+// MARK: - Question Array (In English)
 
-    var body: some View {
-        VStack(spacing: 4) {
-            Image(systemName: iconName)
-                .font(.system(size: 16))
-            Text(title)
-                .font(.caption2)
-        }
-        .foregroundColor(AppTheme.primaryColor)
-    }
+let quizQuestions: [Question] = [
+    Question(
+        text: "Are you more interested in theoretical subjects than practical application?",
+        scoreIfYes: [.engineering: 3, .law: 2, .architecture: -1, .medicine: 0],
+        scoreIfNo: [.architecture: 3, .medicine: 2, .engineering: -1, .law: 0]
+    ),
+    Question(
+        text: "Do you prefer working in a team rather than alone?",
+        scoreIfYes: [.medicine: 3, .architecture: 2, .engineering: 1, .law: 0],
+        scoreIfNo: [.engineering: 2, .law: 3, .medicine: -1, .architecture: -1]
+    ),
+    Question(
+        text: "Do you find satisfaction in solving complex problems or in finding solutions based on ethical/legal principles?",
+        scoreIfYes: [.engineering: 4, .architecture: 2, .law: 0, .medicine: 1],
+        scoreIfNo: [.law: 3, .medicine: 2, .engineering: -2, .architecture: 0]
+    ),
+    Question(
+        text: "Are you comfortable making quick decisions in high-stress and uncertain situations?",
+        scoreIfYes: [.medicine: 4, .law: 2, .engineering: 1, .architecture: 0],
+        scoreIfNo: [.engineering: 2, .architecture: 3, .medicine: -2, .law: -1]
+    ),
+    Question(
+        text: "Are attention to detail and precision more important to you than the big picture and creativity?",
+        scoreIfYes: [.law: 3, .engineering: 2, .medicine: 1, .architecture: -2],
+        scoreIfNo: [.architecture: 4, .medicine: 1, .engineering: 0, .law: -1]
+    ),
+    Question(
+        text: "Are you drawn to the possibility of working directly with people and assisting them with their well-being?",
+        scoreIfYes: [.medicine: 4, .law: 3, .architecture: 1, .engineering: -2],
+        scoreIfNo: [.engineering: 3, .architecture: 2, .law: -1, .medicine: -3]
+    ),
+    Question(
+        text: "Do you enjoy drawing, modeling, or creating visual representations of ideas and projects?",
+        scoreIfYes: [.architecture: 4, .engineering: 1, .medicine: 0, .law: -2],
+        scoreIfNo: [.law: 3, .engineering: 2, .medicine: 1, .architecture: -1]
+    ),
+    Question(
+        text: "Does the idea of spending a lot of time reading and interpreting complex texts (like codes or regulations) fascinate you?",
+        scoreIfYes: [.law: 4, .engineering: 1, .medicine: 0, .architecture: -1],
+        scoreIfNo: [.architecture: 2, .engineering: 3, .medicine: 2, .law: -2]
+    ),
+    Question(
+        text: "Are you skilled at analyzing numerical data, formulas, and complex systems to predict outcomes?",
+        scoreIfYes: [.engineering: 4, .medicine: 1, .architecture: 1, .law: 0],
+        scoreIfNo: [.law: 2, .medicine: 2, .architecture: 1, .engineering: -3]
+    ),
+    Question(
+        text: "When you encounter a problem, is your first instinct to dismantle it and understand how its internal mechanics work?",
+        scoreIfYes: [.engineering: 3, .medicine: 2, .architecture: 1, .law: 0],
+        scoreIfNo: [.law: 2, .medicine: 1, .architecture: 3, .engineering: -1]
+    )
+]
+
+// MARK: - Career tracking model
+
+struct CareerStatus: Identifiable {
+    let id = UUID()
+    let career: Career
+    var played: Bool
 }
 
-// MARK: - VISTA INIZIALE
-struct OrientationMenuView: View {
-    // Lo stato per controllare la navigazione alla schermata delle domande
-    @State private var isGameActive = false
+// MARK: - Main Container View (CrystalBallView)
+
+enum ViewFlow {
+    case menu
+    case quiz
+    case results(Career, [Career: Int])
     
-    // Esempio di 10 domande per l'orientamento
-    private let questions: [Question] = [
-        Question(text: "Are you more interested in theoretical subjects than practical application?"), // Domanda 1
-        Question(text: "Do you prefer working in a team rather than alone?"), // Domanda 2
-        Question(text: "Do you enjoy analyzing complex data and statistics?"),
-        Question(text: "Are you passionate about humanities, such as literature and history?"),
-        Question(text: "Do you like spending time outdoors and with nature?"),
-        Question(text: "Are you comfortable with public speaking and presentations?"),
-        Question(text: "Do you often look for creative solutions to practical problems?"),
-        Question(text: "Is precision and attention to detail important in your activities?"),
-        Question(text: "Do you prefer subjects that require manual skills?"),
-        Question(text: "Do you feel motivated by competition and challenges?") // Domanda 10
-    ]
+}
+
+struct CrystalBallView: View {
+    @State private var currentFlow: ViewFlow = .menu
+    
+        
+    // Stato per tracciare 'played' per ogni categoria
+    @State private var careersStatus: [CareerStatus] = Career.allCases.map { CareerStatus(career: $0, played: false) }
+    
+    private func updatePlayedStatus(winner: Career) {
+        for index in careersStatus.indices {
+            careersStatus[index].played = (careersStatus[index].career == winner)
+        }
+    }
 
     var body: some View {
         NavigationStack {
             ZStack {
-                // Sfondo con il gradiente definito
                 AppTheme.backgroundGradient
                     .ignoresSafeArea()
-                
+
                 VStack {
-                    Spacer()
-                    
-                    // MARK: - Testo di Benvenuto
-                    Text("Welcome future applicant!")
-                        .font(.custom("Palatino", size: 36)) // Utilizza un font che richiami lo stile
-                        .fontWeight(.light)
-                        .foregroundColor(AppTheme.primaryColor)
-                        .multilineTextAlignment(.center)
-                        .padding(.top, 40)
-                    
-                    Spacer().frame(height: 50)
-                    
-                    // MARK: - Card Esplicativa
-                    VStack(spacing: 15) {
-                        Text("In this section, the crystal ball will help you find your right path through \(questions.count) questions about your tastes and personality.")
-                            .font(.title3)
-                            .fontWeight(.regular)
-                            .multilineTextAlignment(.center)
-                        
-                        Text("Press on the icon to get started!")
-                            .font(.headline)
-                            .fontWeight(.bold)
-                            .multilineTextAlignment(.center)
+                    switch currentFlow {
+                    case .menu:
+                        MenuContentView(onStartQuiz: {
+                            withAnimation { currentFlow = .quiz }
+                        })
+                    case .quiz:
+                        QuestionsView(
+                            questions: quizQuestions,
+                            onQuizComplete: { winningCareer, finalScores in
+                                updatePlayedStatus(winner: winningCareer)
+                                withAnimation {
+                                    currentFlow = .results(winningCareer, finalScores)
+                                }
+                            },
+                            onGoBackToMenu: {
+                                withAnimation { currentFlow = .menu }
+                            }
+                        )
+                    case .results(let career, let scores):
+                        ResultsView(
+                            winningCareer: career,
+                            finalScores: scores,
+                            onGoHome: {
+                                withAnimation { currentFlow = .menu }
+                            }
+                        )
                     }
-                    .foregroundColor(AppTheme.primaryColor)
-                    .padding(30)
-                    .frame(maxWidth: .infinity)
-                    .background(
-                        RoundedRectangle(cornerRadius: 25.0)
-                            .fill(AppTheme.darkCardColor)
-                            .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 5)
-                    )
-                    .padding(.horizontal, 30)
-                    
-                    Spacer().frame(height: 60)
-                    
-                    // MARK: - Bottone/Icona Sfera di Cristallo
-                    // Naviga alla prima domanda (indice 0)
-                    NavigationLink(destination: QuestionsView(questions: questions), isActive: $isGameActive) {
-                        EmptyView()
-                    }
-                    .hidden()
-                    
-                    Button {
-                        isGameActive = true
-                    } label: {
-                        // Sostituisco con una SF Symbol
-                        Image(systemName: "globe.central.south.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 50, height: 50)
-                            .foregroundColor(.white)
-                            .padding(30)
-                            .background(
-                                RoundedRectangle(cornerRadius: 25.0)
-                                    .fill(AppTheme.darkCardColor)
-                                    .shadow(color: .black.opacity(0.5), radius: 15, x: 0, y: 8)
-                            )
-                    }
-                    
-                    Spacer()
-                    
-                    // MARK: - Tab Bar Fittizia (Riprodotta dagli screenshot)
-                    HStack {
-                        Spacer()
-                        TabBarItemView(iconName: "house.fill", title: "Home")
-                        Spacer()
-                        TabBarItemView(iconName: "newspaper.fill", title: "News")
-                        Spacer()
-                        TabBarItemView(iconName: "star.fill", title: "Likes")
-                        Spacer()
-                        Image(systemName: "magnifyingglass")
-                            .font(.system(size: 20))
-                            .foregroundColor(.white)
-                            .frame(width: 48, height: 48)
-                            .background(
-                                RoundedRectangle(cornerRadius: 24)
-                                    .fill(AppTheme.darkCardColor)
-                            )
-                        Spacer().frame(width: 10)
-                    }
-                    .padding(.vertical, 10)
-                    .padding(.horizontal, 10)
-                    .background(
-                        RoundedRectangle(cornerRadius: 30)
-                            .fill(AppTheme.darkCardColor)
-                            .frame(maxWidth: .infinity)
-                            .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: -5)
-                    )
-                    .padding(.horizontal, 10)
                 }
             }
             .navigationBarHidden(true)
@@ -148,200 +156,374 @@ struct OrientationMenuView: View {
 }
 
 
-// MARK: - VISTA DEL GIOCO DINAMICO
+
+// MARK: - Sub-View 1: Initial Menu
+
+struct MenuContentView: View {
+    let onStartQuiz: () -> Void
+
+    var body: some View {
+        VStack {
+            // Placeholder for the Top Bar (Assuming CircleButton is defined externally)
+            HStack {
+                CircleButton(systemName: "chevron.left").opacity(0.0)
+                Spacer()
+                CircleButton(systemName: "star").opacity(0.0)
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 18)
+            .frame(height: 70)
+
+            VStack(spacing: 30) {
+                
+                // Title
+                Text("Welcome future applicant!")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .foregroundColor(AppTheme.primaryColor)
+                    .multilineTextAlignment(.center)
+                    .padding(.top, 50)
+                
+                // Descriptive Card
+                VStack(spacing: 15) {
+                    Text("In this section, the crystal ball will help you find your right path through 10 questions about your tastes and personality.")
+                        .font(.body)
+                        .fontWeight(.medium)
+                        .multilineTextAlignment(.center)
+
+                    Text("Press on the icon to get started!")
+                        .font(.headline)
+                        .fontWeight(.semibold)
+                }
+                .foregroundColor(AppTheme.primaryColor)
+                .padding(25)
+                .background(
+                    RoundedRectangle(cornerRadius: 15)
+                        .fill(AppTheme.darkCardColor)
+                        .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 5)
+                )
+                .padding(.horizontal, 20)
+
+                Spacer()
+
+                // Crystal Ball Button
+                Button(action: onStartQuiz) {
+                    Image("Crystal_Ball_white")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 80, height: 80)
+                        .padding(30)
+                        .background(
+                            RoundedRectangle(cornerRadius: 25)
+                                .fill(AppTheme.darkCardColor)
+                                .shadow(color: .black.opacity(0.5), radius: 10, x: 0, y: 5)
+                        )
+                }
+
+                Spacer()
+            }
+        }
+    }
+}
+
+// MARK: - Sub-View 2: Quiz (QuestionsView)
+
 struct QuestionsView: View {
-    @Environment(\.dismiss) var dismiss
-    
-    // Le domande fornite dalla vista precedente
     let questions: [Question]
-    
-    // Indice per tracciare la domanda corrente (parte da 0)
+    let onQuizComplete: (Career, [Career: Int]) -> Void
+    let onGoBackToMenu: () -> Void
+
     @State private var currentQuestionIndex: Int = 0
-    
-    // Risultati, in un'app reale verrebbe usato un set più complesso
     @State private var responses: [UUID: Bool] = [:]
-    
-    // La domanda attuale da mostrare
+    @State private var selectedAnswer: Bool? = nil
+
     var currentQuestion: Question {
         questions[currentQuestionIndex]
     }
-    
-    // Contatore per la UI (es. "1 of 10")
-    var questionCounterText: String {
-        "\(currentQuestionIndex + 1) of \(questions.count)"
-    }
-    
-    // Valore della barra di progresso (0.0 a 1.0)
-    var progressValue: Float {
-        Float(currentQuestionIndex + 1) / Float(questions.count)
+
+    var progressValue: Double {
+        Double(currentQuestionIndex + 1) / Double(questions.count)
     }
 
-    private func answerQuestion(isYes: Bool) {
-        // Registra la risposta
-        responses[currentQuestion.id] = isYes
-        
-        // Controlla se ci sono altre domande
-        if currentQuestionIndex < questions.count - 1 {
-            // Avanza alla prossima domanda
-            currentQuestionIndex += 1
-        } else {
-            // Tutte le domande sono state risposte, naviga al risultato (Simulato)
-            print("Quiz completato. Risposte: \(responses)")
-            // Potresti navigare a una ResultsView qui
-            // Ad esempio: dismiss() per tornare alla OrientationMenuView
-        }
-    }
-    
-    var body: some View {
-        ZStack {
-            AppTheme.backgroundGradient
-                .ignoresSafeArea()
-            
-            VStack(spacing: 0) {
-                // MARK: - Header (Back Button + Progress)
-                HStack {
-                    // Bottone "Back" personalizzato
-                    Button {
-                        // Se non è la prima domanda, torna indietro, altrimenti esci
-                        if currentQuestionIndex > 0 {
-                            currentQuestionIndex -= 1
-                        } else {
-                            dismiss()
-                        }
-                    } label: {
-                        Image(systemName: "chevron.left")
-                            .font(.title2)
-                            .foregroundColor(AppTheme.primaryColor)
-                            .frame(width: 48, height: 48)
-                            .background(
-                                RoundedRectangle(cornerRadius: 15)
-                                    .fill(AppTheme.darkCardColor)
-                            )
-                    }
-                    Spacer()
+    private func calculateResults() -> (Career, [Career: Int]) {
+        var finalScores: [Career: Int] = [
+            .engineering: 0, .architecture: 0, .medicine: 0, .law: 0
+        ]
+
+        for question in questions {
+            if let answer = responses[question.id] {
+                let scores = answer ? question.scoreIfYes : question.scoreIfNo
+                for (career, score) in scores {
+                    finalScores[career] = (finalScores[career] ?? 0) + score
                 }
-                .padding(.horizontal, 20)
-                .padding(.top, 20)
-                
-                // Contatore Domande
-                HStack {
-                    Text(questionCounterText)
-                        .font(.headline)
-                        .foregroundColor(AppTheme.primaryColor.opacity(0.8))
-                    Spacer()
-                }
-                .padding(.horizontal, 25)
-                .padding(.top, 10)
-                
-                // Barra di Progresso
-                ProgressView(value: progressValue)
-                    .progressViewStyle(LinearProgressViewStyle(tint: AppTheme.primaryColor))
-                    .scaleEffect(x: 1, y: 3, anchor: .center) // Aumenta l'altezza visiva
-                    .padding(.horizontal, 25)
-                
-                Spacer()
-                
-                // MARK: - Testo della Domanda
-                Text(currentQuestion.text)
-                    .font(.largeTitle)
-                    .fontWeight(.regular)
-                    .foregroundColor(AppTheme.primaryColor)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 40)
-                    .transition(.opacity) // Aggiungi una transizione per un effetto più fluido
-                
-                Spacer()
-                
-                // MARK: - Bottoni Sì / No
-                HStack(spacing: 30) {
-                    // Bottone "Yes"
-                    AnswerButton(text: "Yes") {
-                        answerQuestion(isYes: true)
-                    }
-                    
-                    // Bottone "No"
-                    AnswerButton(text: "No") {
-                        answerQuestion(isYes: false)
-                    }
-                }
-                .padding(.horizontal, 40)
-                
-                Spacer().frame(height: 50)
-                
-                // MARK: - Icona Sfera di Cristallo Centrale
-                Image(systemName: "globe.central.south.fill")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 50, height: 50)
-                    .foregroundColor(.white)
-                    .padding(30)
-                    .background(
-                        RoundedRectangle(cornerRadius: 25.0)
-                            .fill(AppTheme.darkCardColor)
-                            .shadow(color: .black.opacity(0.5), radius: 15, x: 0, y: 8)
-                    )
-                
-                Spacer()
-                
-                // MARK: - Tab Bar Fittizia (Riprodotta dagli screenshot)
-                HStack {
-                    Spacer()
-                    TabBarItemView(iconName: "house.fill", title: "Home")
-                    Spacer()
-                    TabBarItemView(iconName: "newspaper.fill", title: "News")
-                    Spacer()
-                    TabBarItemView(iconName: "star.fill", title: "Likes")
-                    Spacer()
-                    Image(systemName: "magnifyingglass")
-                        .font(.system(size: 20))
-                        .foregroundColor(.white)
-                        .frame(width: 48, height: 48)
-                        .background(
-                            RoundedRectangle(cornerRadius: 24)
-                                .fill(AppTheme.darkCardColor)
-                        )
-                    Spacer().frame(width: 10)
-                }
-                .padding(.vertical, 10)
-                .padding(.horizontal, 10)
-                .background(
-                    RoundedRectangle(cornerRadius: 30)
-                        .fill(AppTheme.darkCardColor)
-                        .frame(maxWidth: .infinity)
-                        .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: -5)
-                )
-                .padding(.horizontal, 10)
             }
         }
-        .navigationBarHidden(true)
+
+        let winningCareer = finalScores.max { a, b in a.value < b.value }?.key ?? .engineering
+
+        return (winningCareer, finalScores)
+    }
+
+    private func advanceQuestion() {
+        guard let answer = selectedAnswer else { return }
+        responses[currentQuestion.id] = answer
+
+        if currentQuestionIndex == questions.count - 1 {
+            let (winner, scores) = calculateResults()
+            onQuizComplete(winner, scores)
+        } else {
+            withAnimation(.easeInOut(duration: 0.3)) {
+                currentQuestionIndex += 1
+            }
+            selectedAnswer = responses[currentQuestion.id]
+        }
+    }
+
+    private func goBack() {
+        if currentQuestionIndex > 0 {
+            withAnimation(.easeInOut(duration: 0.3)) {
+                currentQuestionIndex -= 1
+            }
+            selectedAnswer = responses[currentQuestion.id]
+        } else {
+            onGoBackToMenu()
+        }
+    }
+
+    var body: some View {
+        VStack {
+            // Header and Progress Bar
+            VStack {
+                // Top Bar - Back Button
+                HStack {
+                    Button(action: goBack) {
+                        Image(systemName: "chevron.backward")
+                            .font(.title2)
+                            .padding(10)
+                            .background(
+                                Circle()
+                                    .fill(AppTheme.darkCardColor.opacity(0.8))
+                            )
+                    }
+                    .padding(.leading, 25)
+                    Spacer()
+                    
+                    // Placeholder per il bottone a destra
+                    CircleButton(systemName: "star").opacity(0.0)
+                        .padding(.trailing, 25)
+                }
+                .padding(.top, 18)
+                
+                // Question Counter (In English)
+                HStack {
+                    Text("\(currentQuestionIndex + 1) of \(questions.count)")
+                        .font(.callout)
+                        .foregroundColor(AppTheme.primaryColor)
+                    Spacer()
+                }
+                .padding(.top, 10)
+                .padding(.horizontal, 25)
+                .padding(.bottom, 10)
+
+                // Progress Bar
+                ProgressView(value: progressValue)
+                    .progressViewStyle(LinearProgressViewStyle(tint: AppTheme.primaryColor))
+                    .scaleEffect(x: 1, y: 2.5, anchor: .center)
+                    .padding(.horizontal, 25)
+                    .padding(.bottom, 30)
+            }
+            .padding(.top, 20)
+
+
+            // Question Text
+            Text(currentQuestion.text)
+                .font(.title2)
+                .fontWeight(.semibold)
+                .foregroundColor(AppTheme.primaryColor)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 30)
+                .frame(maxHeight: .infinity)
+
+            // Answer Buttons (Yes/No)
+            HStack(spacing: 20) {
+                AnswerButtonWithSelection(
+                    title: "Yes",
+                    isSelected: selectedAnswer == true,
+                    action: { selectedAnswer = true }
+                )
+
+                AnswerButtonWithSelection(
+                    title: "No",
+                    isSelected: selectedAnswer == false,
+                    action: { selectedAnswer = false }
+                )
+            }
+            .padding(.horizontal, 25)
+
+            // Crystal Ball Button (Confirm)
+            Button(action: advanceQuestion) {
+                Image("Crystal_Ball_white")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 80, height: 80)
+                    .opacity(selectedAnswer != nil ? 1.0 : 0.4)
+                    .animation(.easeInOut, value: selectedAnswer)
+                    .padding(30)
+                    .background(
+                        RoundedRectangle(cornerRadius: 25)
+                            .fill(AppTheme.darkCardColor)
+                            .shadow(color: .black.opacity(0.5), radius: 10, x: 0, y: 5)
+                    )
+            }
+            .disabled(selectedAnswer == nil)
+            .padding(.vertical, 30)
+
+            Spacer()
+        }
     }
 }
 
-// MARK: - Componente Bottone Risposta
-struct AnswerButton: View {
-    let text: String
+// MARK: - Answer Button Component
+
+struct AnswerButtonWithSelection: View {
+    let title: String
+    let isSelected: Bool
     let action: () -> Void
-    
+
     var body: some View {
         Button(action: action) {
-            Text(text)
-                .font(.title)
-                .fontWeight(.semibold)
+            Text(title)
+                .font(.title2)
+                .fontWeight(.bold)
                 .foregroundColor(AppTheme.primaryColor)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 20)
+                .frame(minWidth: 0, maxWidth: .infinity, minHeight: 60)
+                .padding(.vertical, 15)
                 .background(
-                    RoundedRectangle(cornerRadius: 20)
+                    RoundedRectangle(cornerRadius: 15)
                         .fill(AppTheme.darkCardColor)
-                        .shadow(color: .black.opacity(0.3), radius: 8, x: 0, y: 4)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 15)
+                                .stroke(isSelected ? AppTheme.primaryColor : Color.clear, lineWidth: 3)
+                        )
+                        .shadow(color: .black.opacity(0.5), radius: 8, x: 0, y: 4)
                 )
         }
     }
 }
 
-struct OrientationMenuView_Previews: PreviewProvider {
-    static var previews: some View {
-        OrientationMenuView()
+// MARK: - Sub-View 3: Results (ResultsView)
+
+struct ResultsView: View {
+    let winningCareer: Career
+    let finalScores: [Career: Int]
+    let onGoHome: () -> Void    // 👈 AGGIUNGI QUESTO PARAMETRO
+    @State private var goToHome = false   // 👈 stato per aprire ContainerView
+    @Environment(\.dismiss) var dismiss
+
+    var body: some View {
+        VStack {
+            // Header placeholder
+            HStack {
+                CircleButton(systemName: "chevron.left").opacity(0.0)
+                Spacer()
+                CircleButton(systemName: "star").opacity(0.0)
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 18)
+            .frame(height: 70)
+
+            VStack(spacing: 40) {
+                Spacer()
+
+                Text("Your Ideal Path")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .foregroundColor(AppTheme.primaryColor)
+
+                VStack(spacing: 10) {
+                    Text("Based on your answers, the Crystal Ball reveals a strong affinity with:")
+                        .font(.headline)
+                        .foregroundColor(AppTheme.primaryColor.opacity(0.8))
+                        .padding(.bottom, 10)
+
+                    Text(winningCareer.rawValue)
+                        .font(.system(size: 34, weight: .heavy, design: .serif))
+                        .foregroundColor(AppTheme.primaryColor)
+                        .padding(20)
+                        .background(
+                            RoundedRectangle(cornerRadius: 20)
+                                .fill(AppTheme.darkCardColor.opacity(0.9))
+                                .shadow(color: AppTheme.primaryColor.opacity(0.4), radius: 15)
+                        )
+
+                    // Scores
+                    VStack(alignment: .leading, spacing: 5) {
+                        Divider().background(AppTheme.primaryColor.opacity(0.4))
+                        Text("Detailed Scores (Max: \(finalScores.values.max() ?? 0))")
+                            .font(.caption)
+                            .foregroundColor(AppTheme.primaryColor.opacity(0.7))
+
+                        ForEach(Career.allCases) { career in
+                            HStack {
+                                Text("\(career.rawValue):")
+                                Spacer()
+                                Text("\(finalScores[career] ?? 0) points")
+                                    .fontWeight(.bold)
+                            }
+                        }
+                    }
+                    .padding(.top, 20)
+                    .font(.subheadline)
+                    .foregroundColor(AppTheme.primaryColor)
+                    .padding(.horizontal, 20)
+                }
+                .padding(30)
+                .background(
+                    RoundedRectangle(cornerRadius: 25)
+                        .fill(AppTheme.darkCardColor)
+                        .shadow(color: .black.opacity(0.5), radius: 10, x: 0, y: 5)
+                )
+                .padding(.horizontal, 20)
+
+                Spacer()
+
+                // ✅ Bottone che apre ContainerView a schermo intero
+                Button(action: {
+                    goToHome = true
+                }) {
+                    Text("Return to Home")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(AppTheme.primaryColor)
+                        .frame(minWidth: 0, maxWidth: .infinity)
+                        .padding(.vertical, 20)
+                        .background(
+                            RoundedRectangle(cornerRadius: 15)
+                                .fill(AppTheme.darkCardColor)
+                                .shadow(color: .black.opacity(0.5), radius: 8, x: 0, y: 4)
+                        )
+                }
+                .padding(.horizontal, 25)
+                .fullScreenCover(isPresented: $goToHome) {
+                    AppTabContainer() // 👈 apre ContainerView a schermo intero
+                        .navigationBarBackButtonHidden(true)
+                }
+            }
+        }
     }
 }
 
+
+// MARK: - Preview Provider (Mock)
+
+#Preview {
+    // Mock Container
+    struct PreviewContainer: View {
+        @State private var currentFlow: ViewFlow = .menu
+        var body: some View {
+            CrystalBallView()
+                .preferredColorScheme(.dark)
+        }
+    }
+    return PreviewContainer()
+}
