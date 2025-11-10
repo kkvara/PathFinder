@@ -36,8 +36,7 @@ struct AppTabContainer: View {
                 }
             }
         }
-        // Only visible on the search tab; still fine to keep globally on TabView
-        .searchable(text: $searchText, prompt: "Search places or addresses")
+
     }
 }
 
@@ -46,21 +45,3 @@ struct AppTabContainer: View {
         AppTabContainer()
 }
 
-/*Text("News content here")
-    .tabItem {
-        Image(systemName: "newspaper.fill")
-        Text("News")
-    }
-
-Text("Likes content here")
-    .tabItem {
-        Image(systemName: "star.fill")
-        Text("Likes")
-    }
-
-Text("Search content here")
-    .tabItem {
-        Image(systemName: "magnifyingglass")
-        Text("Search")
-    }
-*/

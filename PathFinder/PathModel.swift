@@ -24,6 +24,7 @@ struct Course: Identifiable {
     let projects: [Project]?          // Lista opzionale di progetti collegati
     let locations: [String]
     let department: String
+    let iconName: String
 }
 
 struct Category: Identifiable {
@@ -50,7 +51,8 @@ let categoriesData: [Category] = [
                 score: 4.5,
                 projects: nil,
                 locations: ["Milan Campus"],
-                department: "Engineering"
+                department: "Engineering",
+                iconName: "airplane.up.forward"
             ),
             Course(
                 name: "Mechanical Engineering",
@@ -64,7 +66,8 @@ let categoriesData: [Category] = [
                 score: 4.4,
                 projects: nil,
                 locations: ["Milan Campus"],
-                department: "Engineering"
+                department: "Engineering",
+                iconName: "gearshape.2.fill"
             ),
             Course(
                 name: "Electrical Engineering",
@@ -78,7 +81,8 @@ let categoriesData: [Category] = [
                 score: 4.6,
                 projects: nil,
                 locations: ["Milan Campus"],
-                department: "Engineering"
+                department: "Engineering",
+                iconName: "lightbulb.min.fill"
             )
         ]
     ),
@@ -98,7 +102,8 @@ let categoriesData: [Category] = [
                 score: 4.3,
                 projects: nil,
                 locations: ["Rome Campus"],
-                department: "Architecture"
+                department: "Architecture",
+                iconName: "house.fill"
             ),
             Course(
                 name: "Urban Planning",
@@ -112,7 +117,8 @@ let categoriesData: [Category] = [
                 score: 4.5,
                 projects: nil,
                 locations: ["Rome Campus"],
-                department: "Architecture"
+                department: "Architecture",
+                iconName: "map.fill"
             ),
             Course(
                 name: "Landscape Architecture",
@@ -126,7 +132,8 @@ let categoriesData: [Category] = [
                 score: 4.4,
                 projects: nil,
                 locations: ["Rome Campus"],
-                department: "Architecture"
+                department: "Architecture",
+                iconName: "leaf.fill"
             )
         ]
     ),
@@ -146,7 +153,8 @@ let categoriesData: [Category] = [
                 score: 4.7,
                 projects: nil,
                 locations: ["Rome Campus"],
-                department: "Medical"
+                department: "Medical",
+                iconName: "syringe.fill"
             ),
             Course(
                 name: "Nursing",
@@ -160,7 +168,8 @@ let categoriesData: [Category] = [
                 score: 4.6,
                 projects: nil,
                 locations: ["Rome Campus"],
-                department: "Medical"
+                department: "Medical",
+                iconName: "heart.fill"
             ),
             Course(
                 name: "Pharmacy",
@@ -174,7 +183,8 @@ let categoriesData: [Category] = [
                 score: 4.5,
                 projects: nil,
                 locations: ["Rome Campus"],
-                department: "Medical"
+                department: "Medical",
+                iconName: "pills.fill"
             )
         ]
     ),
@@ -194,7 +204,8 @@ let categoriesData: [Category] = [
                 score: 4.4,
                 projects: nil,
                 locations: ["Milan Campus"],
-                department: "Law"
+                department: "Law",
+                iconName: "book.fill"
             ),
             Course(
                 name: "International Law",
@@ -208,7 +219,8 @@ let categoriesData: [Category] = [
                 score: 4.5,
                 projects: nil,
                 locations: ["Milan Campus"],
-                department: "Law"
+                department: "Law",
+                iconName: "globe.fill"
             ),
             Course(
                 name: "Criminal Law",
@@ -222,7 +234,8 @@ let categoriesData: [Category] = [
                 score: 4.3,
                 projects: nil,
                 locations: ["Milan Campus"],
-                department: "Law"
+                department: "Law",
+                iconName: "lock.fill"
             )
         ]
     )

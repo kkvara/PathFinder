@@ -6,6 +6,30 @@
 import SwiftUI
 import Foundation
 import Combine
+// MARK: - Reusable CircleButton Component
+
+struct CircleButton: View {
+    let systemName: String
+    var action: (() -> Void)? = nil
+    
+    var body: some View {
+        Button(action: {
+            action?()
+        }) {
+            Image(systemName: systemName)
+                .font(.title2)
+                .foregroundColor(AppTheme.primaryColor)
+                .frame(width: 44, height: 44)
+                .background(
+                    Circle()
+                        .fill(AppTheme.darkCardColor)
+                        .shadow(color: .black.opacity(0.3), radius: 5, x: 0, y: 3)
+                )
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+}
+
 
 
 // MARK: - Data Models

@@ -88,7 +88,7 @@ struct HomeWGameView: View {
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 20) {
                                     ForEach(sortedCourses) { course in
-                                        NavigationLink(destination: CourseDetailView()) {
+                                        NavigationLink(destination: CourseDetailView(course: course)) {
                                             ZStack(alignment: .bottomLeading) {
                                                 Rectangle()
                                                     .fill(Color.blue.opacity(0.6))
