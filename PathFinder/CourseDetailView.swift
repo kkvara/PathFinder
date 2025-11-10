@@ -1,120 +1,101 @@
 import SwiftUI
 
+@available(iOS 26.0, *)
 struct CourseDetailView: View {
     let course: Course
-    
+    @ObservedObject private var favoritesManager = FavoritesManager.shared
+    @State private var isFavoriteLocal: Bool = false
+
     var body: some View {
         ZStack {
-            // Sfondo con il gradiente definito nel file Constants.swift
             AppTheme.backgroundGradient
                 .ignoresSafeArea()
-            
+
             ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 20) {
-                    
-                    // Icona del corso (presa da SF Symbols)
+                VStack(alignment: .leading, spacing: 16) {
+
+                    // top row: star
+                    HStack {
+                        Spacer()
+                        Button(action: {
+                            favoritesManager.toggleFavorite(for: course)
+                            // aggiorna stato locale istantaneamente
+                            isFavoriteLocal = favoritesManager.isFavorite(course)
+                        }) {
+                            Image(systemName: isFavoriteLocal ? "star.fill" : "star")
+                                .font(.system(size: 24))
+                                .foregroundColor(isFavoriteLocal ? .yellow : AppTheme.primaryColor)
+                                .padding(10)
+                        }
+                    }
+                    .padding(.horizontal)
+
+                    // icona corso centrata
                     Image(systemName: course.iconName)
                         .font(.system(size: 60))
-                        .foregroundColor(.white)
+                        .foregroundColor(AppTheme.primaryColor)
                         .frame(maxWidth: .infinity)
-                        .padding(.top, 30)
+                        .padding(.top, 8)
 
-                    
-                    // Titolo del corso
-                    Text(course.name)
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                        .padding(.horizontal)
-                    
-                    // Università
-                    Text(course.university)
-                        .font(.title3)
-                        .fontWeight(.medium)
-                        .foregroundColor(.white.opacity(0.8))
-                        .padding(.horizontal)
-                    
-                    // Descrizione
-                    Text(course.description)
-                        .font(.body)
-                        .foregroundColor(.white)
-                        .padding(.horizontal)
-                    
-                    // Dipartimento e località
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("Department: \(course.department)")
-                            .foregroundColor(.white)
+                    // immagine principale (se esiste)
+                    if !course.imageName.isEmpty {
+                        Image(course.imageName)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(height: 220)
+                            .clipped()
+                            .cornerRadius(14)
+                            .shadow(radius: 8)
+                            .padding(.horizontal)
+                    }
+
+                    // titolo/university/score ecc...
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(course.name)
+                            .font(.system(size: 28, weight: .heavy, design: .rounded))
+                            .foregroundColor(AppTheme.primaryColor)
+                        Text(course.university)
                             .font(.subheadline)
-                        
-                        if !course.locations.isEmpty {
-                            Text("Locations: \(course.locations.joined(separator: ", "))")
-                                .foregroundColor(.white)
-                                .font(.subheadline)
+                            .foregroundColor(AppTheme.primaryColor.opacity(0.85))
+                        HStack {
+                            Image(systemName: "star.fill")
+                                .foregroundColor(.yellow)
+                            Text(String(format: "%.1f", course.score))
+                                .foregroundColor(AppTheme.primaryColor)
                         }
                     }
                     .padding(.horizontal)
-                    
-                    // Punteggio del corso
-                    HStack(spacing: 6) {
-                        Image(systemName: "star.fill")
-                            .foregroundColor(.yellow)
-                        Text(String(format: "%.1f", course.score))
-                            .foregroundColor(.white)
-                            .font(.headline)
-                    }
-                    .padding(.horizontal)
-                    
-                    Divider()
-                        .background(Color.white.opacity(0.3))
+
+                    Divider().background(AppTheme.primaryColor.opacity(0.25)).padding(.horizontal)
+
+                    Text(course.description)
+                        .foregroundColor(AppTheme.primaryColor.opacity(0.95))
                         .padding(.horizontal)
-                    
-                    // Sezione recensioni
+
+                    // recensioni
                     VStack(alignment: .leading, spacing: 10) {
                         Text("Reviews")
-                            .font(.title2)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.white)
-                        
-                        ForEach(course.reviews) { review in
-                            Text("“\(review.text)”")
-                                .font(.body)
-                                .foregroundColor(.white.opacity(0.9))
-                                .padding(.vertical, 6)
-                                .padding(.horizontal)
-                                .background(Color.white.opacity(0.1))
-                                .cornerRadius(10)
+                            .font(.headline)
+                            .foregroundColor(AppTheme.primaryColor)
+                        if course.reviews.isEmpty {
+                            Text("No reviews yet.").foregroundColor(AppTheme.primaryColor.opacity(0.8))
+                        } else {
+                            ForEach(course.reviews) { r in
+                                Text("“\(r.text)”")
+                                    .padding()
+                                    .background(RoundedRectangle(cornerRadius: 12).fill(AppTheme.darkCardColor.opacity(0.6)))
+                                    .foregroundColor(AppTheme.primaryColor)
+                            }
                         }
                     }
                     .padding(.horizontal)
-                    
-                    // Sezione progetti collegati (se presenti)
-                    if let projects = course.projects, !projects.isEmpty {
-                        VStack(alignment: .leading, spacing: 10) {
-                            Text("Related Projects")
-                                .font(.title2)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.white)
-                            
-                            ForEach(projects) { project in
-                                VStack(alignment: .leading) {
-                                    Text(project.name)
-                                        .font(.headline)
-                                        .foregroundColor(.white)
-                                    Text(project.description)
-                                        .font(.subheadline)
-                                        .foregroundColor(.white.opacity(0.9))
-                                }
-                                .padding()
-                                .background(Color.white.opacity(0.1))
-                                .cornerRadius(10)
-                            }
-                        }
-                        .padding(.horizontal)
-                    }
-                    
-                    Spacer(minLength: 50)
+
+                    Spacer(minLength: 40)
                 }
-                .padding(.top)
+                .padding(.vertical)
+                .onAppear {
+                    isFavoriteLocal = favoritesManager.isFavorite(course)
+                }
             }
         }
         .navigationBarTitleDisplayMode(.inline)

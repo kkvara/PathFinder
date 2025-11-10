@@ -152,13 +152,17 @@ struct CrystalBallView: View {
                         })
                     case .quiz:
                         QuestionsView(
-                            questions: quizQuestions,
-                            onQuizComplete: { winningCareer, finalScores in
-                                updatePlayedStatus(winner: winningCareer)
-                                withAnimation {
-                                    currentFlow = .results(winningCareer, finalScores)
-                                }
-                            },
+                                questions: quizQuestions,
+                                onQuizComplete: { winningCareer, finalScores in
+                                    updatePlayedStatus(winner: winningCareer)
+                                    
+                                    // 👇 Salva il risultato in modo persistente
+                                    QuizResultManager.shared.saveResult(winningCareer)
+                                    
+                                    withAnimation {
+                                        currentFlow = .results(winningCareer, finalScores)
+                                    }
+                                },
                             onGoBackToMenu: {
                                 withAnimation { currentFlow = .menu }
                             }

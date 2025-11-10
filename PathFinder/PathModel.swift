@@ -1,30 +1,69 @@
 import Foundation
 
 // Struct to hold individual reviews
-struct Review: Identifiable {
-    let id = UUID()
+struct Review: Identifiable, Codable {
+    let id: UUID
     let text: String
+
+    init(id: UUID = UUID(), text: String) {
+        self.id = id
+        self.text = text
+    }
 }
 
-struct Project: Identifiable {
-    let id = UUID()
+struct Project: Identifiable, Codable {
+    let id: UUID
+    let name: String
+    let description: String
+
+    init(id: UUID = UUID(), name: String, description: String) {
+        self.id = id
+        self.name = name
+        self.description = description
+    }
+}
+
+struct Course: Identifiable, Codable {
+    let id: UUID
     let name: String
     let description: String
     let imageName: String
-}
-
-struct Course: Identifiable {
-    let id = UUID()
-    let name: String
-    let description: String
     let university: String
-    let imageName: String
     let reviews: [Review]             // Array di review (solo testi)
     let score: Double                 // Punteggio complessivo del corso
     let projects: [Project]?          // Lista opzionale di progetti collegati
     let locations: [String]
     let department: String
     let iconName: String
+    var isFavorite: Bool              // variabile mutabile
+
+    init(
+        id: UUID = UUID(),
+        name: String,
+        description: String,
+        university: String,
+        imageName: String,
+        reviews: [Review] = [],
+        score: Double = 0.0,
+        projects: [Project]? = nil,
+        locations: [String] = [],
+        department: String = "",
+        iconName: String = "",
+        isFavorite: Bool = false
+    ) {
+        self.id = id
+        self.name = name
+        self.description = description
+        self.imageName = imageName
+        self.university = university
+        self.reviews = reviews
+        self.score = score
+        self.projects = projects
+        self.locations = locations
+        self.department = department
+        self.iconName = iconName
+        self.isFavorite = isFavorite
+    }
 }
 
 struct Category: Identifiable {
@@ -240,3 +279,4 @@ let categoriesData: [Category] = [
         ]
     )
 ]
+
