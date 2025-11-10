@@ -15,4 +15,10 @@ struct AppTheme {
         startPoint: .top,
         endPoint: .bottom
     )
+    
+    // Colore di base per le card/bottoni, derivato dai colori del gradiente
+    static let darkCardColor = Color(red: 50/255, green: 80/255, blue: 120/255).opacity(0.7) // Colore scuro per card e bottoni
+    
+    // Colore primario per il testo e le icone
+    static let primaryColor = Color.white
 }
