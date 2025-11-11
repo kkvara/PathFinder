@@ -1,7 +1,5 @@
 import SwiftUI
 
-
-
 @available(iOS 26.0, *)
 struct CourseDetailView: View {
     let course: Course
@@ -92,6 +90,40 @@ struct CourseDetailView: View {
                     }
                     .padding(.horizontal)
 
+                    // --- INIZIO NUOVA SEZIONE BOTTONI ---
+                    NavigationLink(destination: LocationsView(course: course)) {
+                        HStack {
+                            Image(systemName: "mappin.and.ellipse")
+                                .font(.system(size: 22))
+                                .foregroundColor(AppTheme.primaryColor)
+                            Text("Location")
+                                .font(.headline)
+                                .foregroundColor(AppTheme.primaryColor)
+                        }
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(RoundedRectangle(cornerRadius: 12).fill(AppTheme.darkCardColor.opacity(0.9)))
+                        .shadow(radius: 5)
+                        .padding(.horizontal)
+                    }
+
+                    NavigationLink(destination: ProjectsView(course: course)) {
+                        HStack {
+                            Image(systemName: "list.bullet.rectangle")
+                                .font(.system(size: 22))
+                                .foregroundColor(AppTheme.primaryColor)
+                            Text("Projects")
+                                .font(.headline)
+                                .foregroundColor(AppTheme.primaryColor)
+                        }
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(RoundedRectangle(cornerRadius: 12).fill(AppTheme.darkCardColor.opacity(0.9)))
+                        .shadow(radius: 5)
+                        .padding(.horizontal)
+                    }
+                    // --- FINE NUOVA SEZIONE BOTTONI ---
+
                     Spacer(minLength: 40)
                 }
                 .padding(.vertical)
@@ -103,3 +135,4 @@ struct CourseDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
 }
+

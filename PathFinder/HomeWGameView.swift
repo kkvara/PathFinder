@@ -54,11 +54,11 @@ struct HomeWGameView: View {
                     ScrollView {
                         VStack(spacing: 20) {
                             HStack(alignment: .center) {
-                                Text("PATH FINDER")
-                                    .font(.system(size: 34, weight: .heavy, design: .rounded))
+                                Text("PATHFINDER")
+                                    .font(.system(size: 34, weight: .heavy,))
                                     .foregroundColor(.white)
                                     .frame(maxWidth: .infinity, alignment: .leading)
-                                    .padding(.leading, 24)
+                                    .padding(.leading,)
                                     .shadow(color: Color.black.opacity(0.25), radius: 4, x: 0, y: 2)
 
                                 Spacer()
@@ -90,18 +90,20 @@ struct HomeWGameView: View {
                                     ForEach(sortedCourses) { course in
                                         NavigationLink(destination: CourseDetailView(course: course)) {
                                             ZStack(alignment: .bottomLeading) {
-                                                Rectangle()
-                                                    .fill(Color.blue.opacity(0.6))
+                                                Image(course.imageName)
+                                                    .resizable()
+                                                    .scaledToFill()
                                                     .frame(width: 280, height: 160)
                                                     .cornerRadius(15)
-
+                                                    .clipped()
+                                                
                                                 LinearGradient(
                                                     gradient: Gradient(colors: [Color.black.opacity(0.6), Color.clear]),
                                                     startPoint: .bottom,
                                                     endPoint: .center
                                                 )
                                                 .cornerRadius(15)
-
+                                                
                                                 Text(course.name)
                                                     .font(.headline)
                                                     .bold()
@@ -114,18 +116,16 @@ struct HomeWGameView: View {
                                         }
                                     }
                                 }
-                                .padding(.top, 30)
+                                .padding(.top ,)
                                 .padding(.horizontal)
+                                .padding(.bottom ,)
                             }
-
+                            
                             NavigationLink(destination: DepartmentsView()) {
                                 VStack(alignment: .leading, spacing: 6) {
                                     Text("List of Departments")
                                         .font(.system(size: 28, weight: .heavy, design: .rounded))
                                         .foregroundColor(.white)
-                                    Text("Clicca qui per esplorare tutti i dipartimenti disponibili e scopri il percorso giusto per te")
-                                        .font(.system(size: 16, weight: .regular, design: .rounded))
-                                        .foregroundColor(.white.opacity(0.7))
                                 }
                                 .padding()
                                 .frame(maxWidth: .infinity)

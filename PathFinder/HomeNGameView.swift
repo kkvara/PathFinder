@@ -80,17 +80,20 @@ struct HomeNGameView: View {
                                 ForEach(allCoursesSorted) { course in
                                     NavigationLink(destination: CourseDetailView(course: course)) {
                                         ZStack(alignment: .bottomLeading) {
-                                            Rectangle()
-                                                .fill(Color.blue.opacity(0.6))
+                                            Image(course.imageName)
+                                                .resizable()
+                                                .scaledToFill()
                                                 .frame(width: 280, height: 160)
                                                 .cornerRadius(15)
-
+                                                .clipped()
+                                            
                                             LinearGradient(
                                                 gradient: Gradient(colors: [Color.black.opacity(0.6), Color.clear]),
                                                 startPoint: .bottom,
-                                                endPoint: .center)
-                                                .cornerRadius(15)
-
+                                                endPoint: .center
+                                            )
+                                            .cornerRadius(15)
+                                            
                                             Text(course.name)
                                                 .font(.headline)
                                                 .bold()
@@ -113,9 +116,6 @@ struct HomeNGameView: View {
                                 Text("List of Departments")
                                     .font(.system(size: 28, weight: .heavy, design: .rounded))
                                     .foregroundColor(.white)
-                                Text("Esplora tutti i dipartimenti disponibili e scopri il percorso giusto per te")
-                                    .font(.system(size: 16, weight: .regular, design: .rounded))
-                                    .foregroundColor(.white.opacity(0.7))
                             }
                             .padding()
                             .frame(maxWidth: .infinity)
