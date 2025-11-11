@@ -17,19 +17,16 @@ struct AppTabContainer: View {
         TabView {
             Tab("Home", systemImage: "house.fill") {
                 if gameState.hasPlayedGame {
-                                    HomeWGameView()
-                                        .environmentObject(gameState)
-                                } else {
-                                    HomeNGameView()
-                                        .environmentObject(gameState)
-                                }
-
+                    HomeWGameView()
+                        .environmentObject(gameState)
+                } else {
+                    HomeNGameView()
+                        .environmentObject(gameState)
+                }
             }
 
             Tab("News", systemImage: "newspaper.fill") {
-                Text("Teams Screen")
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color(.systemBackground))
+                NewsView() // Qui metti la tua NewsView
             }
 
             Tab("Likes", systemImage: "star.fill") {
@@ -46,8 +43,8 @@ struct AppTabContainer: View {
         }
         .environmentObject(gameState)
     }
-      
 }
+
 
 #Preview {
         // Inject RouteManager so any child views that use @EnvironmentObject RouteManager won’t crash.

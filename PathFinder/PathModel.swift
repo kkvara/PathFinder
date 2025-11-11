@@ -74,6 +74,28 @@ struct Category: Identifiable {
     let courses: [Course]             // Corsi che appartengono alla categoria
 }
 
+struct News: Identifiable, Codable {
+    let id: UUID
+    let title: String
+    let summary: String
+    let content: String
+    let imageName: String  // opzione per immagine associata
+
+    init(id: UUID = UUID(), title: String, summary: String, content: String, imageName: String) {
+        self.id = id
+        self.title = title
+        self.summary = summary
+        self.content = content
+        self.imageName = imageName
+    }
+}
+
+var allNews: [News] = [
+        News(title: "Titolo 1", summary: "Breve sommario 1", content: "Contenuto completo news 1", imageName: "image1"),
+        News(title: "Titolo 2", summary: "Breve sommario 2", content: "Contenuto completo news 2", imageName: "image2"),
+        // ...
+    ]
+
 let categoriesData: [Category] = [
     Category(
         name: "Engineering",
