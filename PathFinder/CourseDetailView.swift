@@ -1,5 +1,7 @@
 import SwiftUI
 
+
+
 @available(iOS 26.0, *)
 struct CourseDetailView: View {
     let course: Course
@@ -14,12 +16,11 @@ struct CourseDetailView: View {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 16) {
 
-                    // top row: star
+                    // top row: bottone stella
                     HStack {
                         Spacer()
                         Button(action: {
                             favoritesManager.toggleFavorite(for: course)
-                            // aggiorna stato locale istantaneamente
                             isFavoriteLocal = favoritesManager.isFavorite(course)
                         }) {
                             Image(systemName: isFavoriteLocal ? "star.fill" : "star")
@@ -49,7 +50,7 @@ struct CourseDetailView: View {
                             .padding(.horizontal)
                     }
 
-                    // titolo/university/score ecc...
+                    // titolo, università, score
                     VStack(alignment: .leading, spacing: 8) {
                         Text(course.name)
                             .font(.system(size: 28, weight: .heavy, design: .rounded))
@@ -78,7 +79,8 @@ struct CourseDetailView: View {
                             .font(.headline)
                             .foregroundColor(AppTheme.primaryColor)
                         if course.reviews.isEmpty {
-                            Text("No reviews yet.").foregroundColor(AppTheme.primaryColor.opacity(0.8))
+                            Text("No reviews yet.")
+                                .foregroundColor(AppTheme.primaryColor.opacity(0.8))
                         } else {
                             ForEach(course.reviews) { r in
                                 Text("“\(r.text)”")

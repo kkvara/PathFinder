@@ -30,9 +30,8 @@ struct AppTabContainer: View {
             }
 
             Tab("Likes", systemImage: "star.fill") {
-                Text("Profile Screen")
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color(.systemBackground))
+                FavoritesView()
+                
             }
 
             Tab(role: .search) {
@@ -42,6 +41,7 @@ struct AppTabContainer: View {
             }
         }
         .environmentObject(gameState)
+        
     }
 }
 
