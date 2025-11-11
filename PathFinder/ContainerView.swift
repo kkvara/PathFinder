@@ -146,7 +146,7 @@ struct SearchResultCardView: View {
             Spacer()
         }
         .padding()
-        .background(Color(red: 0.0, green: 0.1, blue: 0.5))// Background azzurro pieno senza trasparenze
+        .background(Color.white.opacity(0.15))// Background azzurro pieno senza trasparenze
         .cornerRadius(20)
         // Nessuna ombra
     }
