@@ -445,6 +445,8 @@ struct ResultsView: View {
     let winningCareer: Career
     let finalScores: [Career: Int]
     let onGoHome: () -> Void    // 👈 AGGIUNGI QUESTO PARAMETRO
+    @EnvironmentObject var gameState: GameState
+
     @State private var goToHome = false   // 👈 stato per aprire ContainerView
     @Environment(\.dismiss) var dismiss
 
@@ -517,7 +519,11 @@ struct ResultsView: View {
 
                 // ✅ Bottone che apre ContainerView a schermo intero
                 Button(action: {
-                    goToHome = true
+                    //goToHome = true
+                    gameState.hasPlayedGame = true
+
+                    // Torna indietro alla view precedente (ContainerView)
+                    dismiss()
                 }) {
                     Text("Return to Home")
                         .font(.title2)

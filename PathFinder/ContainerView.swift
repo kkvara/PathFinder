@@ -11,11 +11,19 @@ import Combine
 @available(iOS 26.0, *)
 struct AppTabContainer: View {
     @State private var searchText: String = ""
+    @StateObject var gameState = GameState()
 
     var body: some View {
         TabView {
             Tab("Home", systemImage: "house.fill") {
-                HomeWGameView()
+                if gameState.hasPlayedGame {
+                                    HomeWGameView()
+                                        .environmentObject(gameState)
+                                } else {
+                                    HomeNGameView()
+                                        .environmentObject(gameState)
+                                }
+
             }
 
             Tab("News", systemImage: "newspaper.fill") {
@@ -36,8 +44,9 @@ struct AppTabContainer: View {
                 }
             }
         }
-
+        .environmentObject(gameState)
     }
+      
 }
 
 #Preview {

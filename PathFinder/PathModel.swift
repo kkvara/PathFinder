@@ -1,4 +1,5 @@
 import Foundation
+import Combine
 
 // Struct to hold individual reviews
 struct Review: Identifiable, Codable {
@@ -69,7 +70,7 @@ struct Course: Identifiable, Codable {
 struct Category: Identifiable {
     let id = UUID()
     let name: String
-    let played: Bool                  // Stato di "played" solo per la categoria principale
+    var played: Bool                  // Stato di "played" solo per la categoria principale
     let courses: [Course]             // Corsi che appartengono alla categoria
 }
 
@@ -279,4 +280,19 @@ let categoriesData: [Category] = [
         ]
     )
 ]
+
+struct PathModel {
+    // Controlla se almeno una categoria è "played"
+    static func hasAnyCategoryPlayed(categories: [Category]) -> Bool {
+        categories.contains(where: { $0.played })
+    }
+
+    // Imposta played a true per una categoria (passa il nome o id)
+    static func setCategoryPlayed(categories: inout [Category], categoryName: String) {
+        if let index = categories.firstIndex(where: { $0.name == categoryName }) {
+            categories[index].played = true
+        }
+    }
+}
+
 

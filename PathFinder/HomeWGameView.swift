@@ -123,7 +123,7 @@ struct HomeWGameView: View {
                                     Text("List of Departments")
                                         .font(.system(size: 28, weight: .heavy, design: .rounded))
                                         .foregroundColor(.white)
-                                    Text("Esplora tutti i dipartimenti disponibili e scopri il percorso giusto per te")
+                                    Text("Clicca qui per esplorare tutti i dipartimenti disponibili e scopri il percorso giusto per te")
                                         .font(.system(size: 16, weight: .regular, design: .rounded))
                                         .foregroundColor(.white.opacity(0.7))
                                 }
