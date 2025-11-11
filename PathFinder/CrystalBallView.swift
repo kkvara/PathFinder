@@ -171,9 +171,7 @@ struct CrystalBallView: View {
                         ResultsView(
                             winningCareer: career,
                             finalScores: scores,
-                            onGoHome: {
-                                withAnimation { currentFlow = .menu }
-                            }
+                            
                         )
                     }
                 }
@@ -444,15 +442,13 @@ struct AnswerButtonWithSelection: View {
 struct ResultsView: View {
     let winningCareer: Career
     let finalScores: [Career: Int]
-    let onGoHome: () -> Void    // 👈 AGGIUNGI QUESTO PARAMETRO
-    @EnvironmentObject var gameState: GameState
 
-    @State private var goToHome = false   // 👈 stato per aprire ContainerView
+    @EnvironmentObject var gameState: GameState
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
         VStack {
-            // Header placeholder
+            // Header con placeholder
             HStack {
                 CircleButton(systemName: "chevron.left").opacity(0.0)
                 Spacer()
@@ -486,7 +482,7 @@ struct ResultsView: View {
                                 .shadow(color: AppTheme.primaryColor.opacity(0.4), radius: 15)
                         )
 
-                    // Scores
+                    // Visualizza punteggi dettagliati per career
                     VStack(alignment: .leading, spacing: 5) {
                         Divider().background(AppTheme.primaryColor.opacity(0.4))
                         Text("Detailed Scores (Max: \(finalScores.values.max() ?? 0))")
@@ -517,12 +513,15 @@ struct ResultsView: View {
 
                 Spacer()
 
-                // ✅ Bottone che apre ContainerView a schermo intero
+                // Bottone ritorno a home che aggiorna lo stato e setta la categoria played
                 Button(action: {
-                    //goToHome = true
+                    // Aggiorna stato della categoria giocata in PathModel
+                    PathModel.setCategoryPlayed(categories: &categoriesData, categoryName: winningCareer.rawValue)
+
+                    // Imposta stato globale gioco fatto
                     gameState.hasPlayedGame = true
 
-                    // Torna indietro alla view precedente (ContainerView)
+                    // Torna indietro alla vista precedente (ContainerView)
                     dismiss()
                 }) {
                     Text("Return to Home")
@@ -538,10 +537,6 @@ struct ResultsView: View {
                         )
                 }
                 .padding(.horizontal, 25)
-                .fullScreenCover(isPresented: $goToHome) {
-                    AppTabContainer() // 👈 apre ContainerView a schermo intero
-                        .navigationBarBackButtonHidden(true)
-                }
             }
         }
     }

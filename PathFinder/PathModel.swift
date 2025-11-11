@@ -96,7 +96,7 @@ var allNews: [News] = [
         // ...
     ]
 
-let categoriesData: [Category] = [
+var categoriesData: [Category] = [
     Category(
         name: "Engineering",
         played: false,
