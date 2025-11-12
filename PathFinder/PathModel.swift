@@ -23,12 +23,15 @@ struct LocationDetail: Identifiable, Codable {
 struct Review: Identifiable, Codable {
     let id: UUID
     let text: String
+    let rating: Int  // Nuovo campo da 1 a 5
 
-    init(id: UUID = UUID(), text: String) {
+    init(id: UUID = UUID(), text: String, rating: Int) {
         self.id = id
         self.text = text
+        self.rating = rating
     }
 }
+
 
 struct Project: Identifiable, Codable {
     let id: UUID
@@ -127,8 +130,8 @@ var categoriesData: [Category] = [
                     university: "Università degli studi di Napoli Federico II",
                     imageName: "aerospace",
                     reviews: [
-                        Review(text: "The teachers are helpful and very prepared."),
-                        Review(text: "Nice combination of theory and practice.")
+                        Review(text: "The teachers are helpful and very prepared.", rating: 5),
+                        Review(text: "Nice combination of theory and practice.", rating: 4)
                     ],
                     score: 4.5,
                     projects: nil,
@@ -162,8 +165,8 @@ var categoriesData: [Category] = [
                     university: "Università degli studi di Napoli Federico II",
                     imageName: "civil",
                     reviews: [
-                        Review(text: "Strong focus on practical applications."),
-                        Review(text: "Good balance of theory and lab work.")
+                        Review(text: "Strong focus on practical applications.", rating: 4),
+                        Review(text: "Good balance of theory and lab work.", rating: 3)
                     ],
                     score: 4.4,
                     projects: nil,
@@ -197,8 +200,8 @@ var categoriesData: [Category] = [
                     university: "Università degli studi di Napoli Federico II",
                     imageName: "electrical",
                     reviews: [
-                        Review(text: "Well-structured and challenging."),
-                        Review(text: "Professors are highly knowledgeable.")
+                        Review(text: "Well-structured and challenging.", rating: 4),
+                        Review(text: "Professors are highly knowledgeable.", rating: 5)
                     ],
                     score: 4.6,
                     projects: nil,
@@ -238,8 +241,8 @@ var categoriesData: [Category] = [
                     university: "Università degli studi di Napoli Federico II",
                     imageName: "Community design",
                     reviews: [
-                        Review(text: "Creative and inspiring classes."),
-                        Review(text: "Good mix of theory and hands-on projects.")
+                        Review(text: "Creative and inspiring classes.", rating: 3),
+                        Review(text: "Good mix of theory and hands-on projects.", rating: 4)
                     ],
                     score: 4.3,
                     projects: [
@@ -266,8 +269,8 @@ var categoriesData: [Category] = [
                     university: "Università degli studi di Napoli Federico II",
                     imageName: "science",
                     reviews: [
-                        Review(text: "Insightful and well structured."),
-                        Review(text: "Real-world applications are very useful.")
+                        Review(text: "Insightful and well structured.", rating: 4),
+                        Review(text: "No Real-world applications.", rating: 2)
                     ],
                     score: 4.5,
                     projects: nil,
@@ -291,8 +294,8 @@ var categoriesData: [Category] = [
                     university: "Università degli studi di Napoli Federico II",
                     imageName: "urban",
                     reviews: [
-                        Review(text: "Engaging and practical."),
-                        Review(text: "Focus on sustainability is appreciated.")
+                        Review(text: "Engaging and practical.", rating: 3),
+                        Review(text: "Focus on sustainability is appreciated.", rating: 3)
                     ],
                     score: 4.4,
                     projects: nil,
@@ -322,8 +325,8 @@ var categoriesData: [Category] = [
                     university: "Università degli studi di Napoli Federico II",
                     imageName: "pediatric",
                     reviews: [
-                        Review(text: "Challenging coursework, but satisfying."),
-                        Review(text: "Grants a solid base for medical professions.")
+                        Review(text: "Challenging coursework, but satisfying.", rating: 3),
+                        Review(text: "Grants a solid base for medical professions.", rating: 4)
                     ],
                     score: 4.7,
                     projects: nil,
@@ -346,8 +349,8 @@ var categoriesData: [Category] = [
                     university: "Università degli studi di Napoli Federico II",
                     imageName: "nursing",
                     reviews: [
-                        Review(text: "Very practical and rewarding course."),
-                        Review(text: "Excellent clinical practice opportunities.")
+                        Review(text: "Very practical and rewarding course.", rating: 5),
+                        Review(text: "Excellent clinical practice opportunities.", rating: 4)
                     ],
                     score: 4.6,
                     projects: nil,
@@ -370,8 +373,8 @@ var categoriesData: [Category] = [
                     university: "Università degli studi di Napoli Federico II",
                     imageName: "dietetics",
                     reviews: [
-                        Review(text: "Highly informative and detailed."),
-                        Review(text: "Good combination of theory and labs.")
+                        Review(text: "Highly informative and detailed.", rating: 3),
+                        Review(text: "Good combination of theory and labs.", rating: 4)
                     ],
                     score: 4.5,
                     projects: nil,
@@ -400,8 +403,8 @@ var categoriesData: [Category] = [
                     university: "Università degli studi di Napoli Federico II",
                     imageName: "legal",
                     reviews: [
-                        Review(text: "Entertaining and in-depth courses."),
-                        Review(text: "Sometimes it's tough to keep up with the lessons.")
+                        Review(text: "Entertaining and in-depth courses.", rating: 5),
+                        Review(text: "Sometimes it's tough to keep up with the lessons.", rating: 2)
                     ],
                     score: 4.4,
                     projects: nil,
@@ -424,8 +427,8 @@ var categoriesData: [Category] = [
                     university: "Università degli studi di Napoli Federico II",
                     imageName: "business",
                     reviews: [
-                        Review(text: "Challenging but very enriching."),
-                        Review(text: "Great insight into global issues.")
+                        Review(text: "Challenging but very enriching.", rating: 3),
+                        Review(text: "Great insight into global issues.", rating: 5)
                     ],
                     score: 4.5,
                     projects: nil,
@@ -443,8 +446,8 @@ var categoriesData: [Category] = [
                     university: "Università degli studi di Napoli Federico II",
                     imageName: "third",
                     reviews: [
-                        Review(text: "Very detailed and practical."),
-                        Review(text: "Professors are very approachable.")
+                        Review(text: "Very detailed and practical.", rating: 4),
+                        Review(text: "Professors are very approachable.", rating: 4)
                     ],
                     score: 4.3,
                     projects: nil,

@@ -59,24 +59,27 @@ struct HomeNGameView: View {
                         // --- Tutto il resto identico alla HomeWGameView --- //
 
                         // Header testuale allineato a sinistra
-                        Text("PATH FINDER")
-                            .font(.system(size: 34, weight: .heavy, design: .rounded))
+                        Text("PATHFINDER")
+                            .font(.system(size: 34, weight: .heavy))
                             .foregroundColor(.white)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.leading, 24)
+                            .frame(maxWidth: .infinity, alignment: .center)
                             .shadow(color: Color.black.opacity(0.25), radius: 4, x: 0, y: 2)
+                            .padding(.bottom, 30) // aumenta questo padding
 
                         // Titolo sezione consigliati
                         Text("Recommended Paths For You")
                             .font(.title2)
+                            .padding(.horizontal)
+                            .padding(.leading, 5)
+                            .padding(.bottom, 10)  // padding solo sotto, meno spazio verticale
                             .fontWeight(.bold)
                             .foregroundColor(.white)
-                            .padding(.horizontal)
                             .frame(maxWidth: .infinity, alignment: .leading)
+
 
                         // ScrollView orizzontale dei corsi consigliati (identico a HomeWGameView)
                         ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 20) {
+                            HStack(spacing: 0) {
                                 ForEach(allCoursesSorted) { course in
                                     NavigationLink(destination: CourseDetailView(course: course)) {
                                         ZStack(alignment: .bottomLeading) {
@@ -106,7 +109,6 @@ struct HomeNGameView: View {
                                     }
                                 }
                             }
-                            .padding(.top, 30)
                             .padding(.horizontal)
                         }
 
@@ -128,7 +130,7 @@ struct HomeNGameView: View {
 
                         // Classifica dinamica
                         VStack(alignment: .leading, spacing: 14) {
-                            Text("Classifica dei Percorsi")
+                            Text("Ranking of courses")
                                 .font(.title2)
                                 .fontWeight(.heavy)
                                 .foregroundColor(.white)
@@ -150,7 +152,7 @@ struct HomeNGameView: View {
                                         .font(.system(.body, design: .rounded))
                                         .bold()
                                     Spacer()
-                                    Text(String(format: "%.0f%% feedback positivi", entry.positivePercent))
+                                    Text(String(format: "%.0f%% positive feedbacks", entry.positivePercent))
                                         .foregroundColor(.white.opacity(0.8))
                                         .font(.system(.body, design: .rounded))
                                 }
@@ -162,7 +164,7 @@ struct HomeNGameView: View {
                                     showFullLeaderboard.toggle()
                                 }
                             }) {
-                                Text(showFullLeaderboard ? "Mostra meno" : "Mostra tutta la classifica")
+                                Text(showFullLeaderboard ? "Show less" : "Show more")
                                     .font(.callout)
                                     .foregroundColor(.blue.opacity(0.7))
                                     .padding(.top, 8)
@@ -174,6 +176,7 @@ struct HomeNGameView: View {
                         Spacer(minLength: 20)
                     }
                 }
+                
             }
         }
     }

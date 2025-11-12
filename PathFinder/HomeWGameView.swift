@@ -137,7 +137,7 @@ struct HomeWGameView: View {
                             }
 
                             VStack(alignment: .leading, spacing: 14) {
-                                Text("Classifica dei Percorsi")
+                                Text("Ranking of courses")
                                     .font(.title2)
                                     .fontWeight(.heavy)
                                     .foregroundColor(.white)
@@ -159,7 +159,7 @@ struct HomeWGameView: View {
                                             .font(.system(.body, design: .rounded))
                                             .bold()
                                         Spacer()
-                                        Text(String(format: "%.0f%% feedback positivi", entry.positivePercent))
+                                        Text(String(format: "%.0f%% positive feedbacks", entry.positivePercent))
                                             .foregroundColor(.white.opacity(0.8))
                                             .font(.system(.body, design: .rounded))
                                     }
@@ -171,7 +171,7 @@ struct HomeWGameView: View {
                                         showFullLeaderboard.toggle()
                                     }
                                 }) {
-                                    Text(showFullLeaderboard ? "Mostra meno" : "Mostra tutta la classifica")
+                                    Text(showFullLeaderboard ? "Show less" : "Show more")
                                         .font(.callout)
                                         .foregroundColor(.blue.opacity(0.7))
                                         .padding(.top, 8)
