@@ -34,9 +34,10 @@ struct HomeNGameView: View {
                         VStack(spacing: 20) {
                             Text("Click here to discover your path")
                                 .font(.system(size: 20, weight: .semibold, design: .rounded))
-                                .foregroundColor(.white.opacity(0.85))
+                                .foregroundColor(.white)
                                 .padding(.top, 60)
                                 .transition(.opacity)
+                                .padding(.bottom, 40)
                             
                             // Button with extra padding
                             NavigationLink(destination: CrystalBallView()) {
@@ -54,7 +55,7 @@ struct HomeNGameView: View {
                                             )
                                         )
                                         .shadow(color: Color.cyan.opacity(0.5), radius: 15, x: 0, y: 0)
-                                    
+                                        
                                     Image("Crystal_Ball_white")
                                         .resizable()
                                         .scaledToFit()
@@ -63,6 +64,15 @@ struct HomeNGameView: View {
                                 }
                                 .frame(width: 160, height: 160)
                                 .scaleEffect(pulse ? 1.1 : 1.0, anchor: .center)
+                                .padding(.bottom, 24)
+                                .onAppear {
+                                    withAnimation(Animation.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
+                                        pulse = true
+                                    }
+                                }
+
+                                .frame(width: 160, height: 160)
+                                .scaleEffect(pulse ? 1.02 : 1.0, anchor: .center)
                                 .padding(.bottom, 24) // <-- padding BETWEEN button and next section
                             }
                             
@@ -183,3 +193,6 @@ struct HomeNGameView: View {
         }
     }
 
+#Preview {
+    HomeNGameView()
+}

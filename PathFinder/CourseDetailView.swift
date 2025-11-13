@@ -22,6 +22,7 @@ struct CourseDetailView: View {
                 .ignoresSafeArea()
 
             ScrollView(showsIndicators: false) {
+                // Padding applicato al VStack principale per spazio ai lati
                 VStack(alignment: .leading, spacing: 16) {
                     // top row: bottone stella
                     HStack {
@@ -36,7 +37,6 @@ struct CourseDetailView: View {
                                 .padding(10)
                         }
                     }
-                    .padding(.horizontal)
 
                     // icona corso centrata
                     Image(systemName: course.iconName)
@@ -55,7 +55,6 @@ struct CourseDetailView: View {
                             .clipped()
                             .cornerRadius(14)
                             .shadow(radius: 8)
-                            .padding(.horizontal)
                     }
 
                     // titolo, università
@@ -67,16 +66,13 @@ struct CourseDetailView: View {
                             .font(.subheadline)
                             .foregroundColor(AppTheme.primaryColor.opacity(0.85))
                     }
-                    .padding(.horizontal)
 
                     Divider()
                         .background(AppTheme.primaryColor.opacity(0.25))
-                        .padding(.horizontal)
 
                     // descrizione con padding bottom per distanza da bottoni
                     Text(course.description)
                         .foregroundColor(AppTheme.primaryColor.opacity(0.95))
-                        .padding(.horizontal)
                         .padding(.bottom, 24)
 
                     // --- SEZIONE BOTTONI ---
@@ -93,7 +89,6 @@ struct CourseDetailView: View {
                         .frame(maxWidth: .infinity)
                         .background(RoundedRectangle(cornerRadius: 12).fill(AppTheme.darkCardColor.opacity(0.9)))
                         .shadow(radius: 5)
-                        .padding(.horizontal)
                     }
 
                     NavigationLink(destination: ProjectsView(course: course)) {
@@ -109,13 +104,13 @@ struct CourseDetailView: View {
                         .frame(maxWidth: .infinity)
                         .background(RoundedRectangle(cornerRadius: 12).fill(AppTheme.darkCardColor.opacity(0.9)))
                         .shadow(radius: 5)
-                        .padding(.horizontal)
                     }
 
                     // --- SEZIONE RECENSIONI ---
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Reviews")
-                            .font(.headline)
+                            .font(.title3)
+                            .fontWeight(.bold)
                             .foregroundColor(AppTheme.primaryColor)
 
                         if displayedReviews.isEmpty {
@@ -139,7 +134,6 @@ struct CourseDetailView: View {
                                     }
                                 }
                             }
-
                             if displayedReviews.count > 3 {
                                 Button(action: {
                                     withAnimation {
@@ -154,7 +148,6 @@ struct CourseDetailView: View {
                             }
                         }
                     }
-                    .padding(.horizontal)
                     .padding(.bottom, 10)
 
                     // Bottone per mostrare form recensione sotto alle review
@@ -164,9 +157,9 @@ struct CourseDetailView: View {
                         }
                     }) {
                         Text(showReviewForm ? "Cancel Review" : "Add a review")
-                            .font(.headline)
+                            .font(.title3)
+                            .fontWeight(.bold)
                             .foregroundColor(AppTheme.primaryColor)
-                            .padding(.horizontal)
                     }
 
                     // Form recensione nascosto / visibile
@@ -214,11 +207,11 @@ struct CourseDetailView: View {
                         }
                         .padding()
                         .background(RoundedRectangle(cornerRadius: 12).fill(AppTheme.darkCardColor.opacity(0.9)))
-                        .padding(.horizontal)
                     }
 
                     Spacer(minLength: 20)
                 }
+                .padding(.horizontal) // QUESTO È IL PADDING AGGIUNTO
                 .padding(.vertical)
                 .onAppear {
                     isFavoriteLocal = favoritesManager.isFavorite(course)

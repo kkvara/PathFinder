@@ -537,6 +537,7 @@ struct ResultsView: View {
                         )
                 }
                 .padding(.horizontal, 25)
+                .padding(.bottom, 100)
             }
         }
     }
