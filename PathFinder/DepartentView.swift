@@ -1,21 +1,5 @@
 import SwiftUI
 
-extension Color {
-    init(hex: String) {
-        var hexString = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
-        if hexString.hasPrefix("#") { hexString.removeFirst() }
-
-        var int: UInt64 = 0
-        Scanner(string: hexString).scanHexInt64(&int)
-
-        let r = Double((int >> 16) & 0xFF) / 255.0
-        let g = Double((int >> 8) & 0xFF) / 255.0
-        let b = Double(int & 0xFF) / 255.0
-
-        self.init(red: r, green: g, blue: b)
-    }
-}
-
 struct DepartmentsView: View {
     private func categoryForTitle(_ title: String) -> Category? {
         categoriesData.first { $0.name.lowercased() == title.lowercased() }
@@ -24,17 +8,17 @@ struct DepartmentsView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(hex: "#102037")
+                // Sfondo con il gradiente da file costanti
+                AppTheme.backgroundGradient
                     .ignoresSafeArea()
 
                 VStack(spacing: 40) {
-                    VStack(spacing: 12) {
-                        Text("DEPARTMENTS")
-                            .font(.system(size: 36, weight: .heavy))
-                            .foregroundColor(.white)
-                    }
-                    .padding(.top, 60)
-                    .padding(.bottom, 60)
+                    Text("DEPARTMENTS")
+                        .font(.system(size: 36, weight: .heavy))
+                        .foregroundColor(.white)
+                        .padding(.top, 60)
+                        .padding(.bottom, 60)
+
                     let columns = [
                         GridItem(.flexible(minimum: 150), spacing: 20),
                         GridItem(.flexible(minimum: 150), spacing: 20)
@@ -51,9 +35,7 @@ struct DepartmentsView: View {
 
                     Spacer()
                 }
-
             }
-            .navigationBarHidden(true)
         }
     }
 
@@ -78,6 +60,7 @@ struct DepartmentsView: View {
                 RoundedRectangle(cornerRadius: 20)
                     .fill(Color.white.opacity(0.15))
                     .frame(width: 100, height: 100)
+
                 Image(systemName: icon)
                     .font(.system(size: 38))
                     .foregroundColor(.white)
@@ -93,8 +76,6 @@ struct DepartmentsView: View {
         .frame(maxWidth: .infinity)
     }
 }
-
-// Assicurati di avere la view CategoryCoursesView come definita prima, ad esempio
 
 struct CategoryCoursesView: View {
     let category: Category
@@ -122,6 +103,7 @@ struct CategoryCoursesView: View {
                 }
                 .padding(.vertical)
             }
+            // Usa gradiente come sfondo
             .background(AppTheme.backgroundGradient)
             .navigationBarTitleDisplayMode(.inline)
         }
@@ -160,7 +142,5 @@ struct CourseCardView: View {
 }
 
 #Preview {
-    if let firstCategory = categoriesData.first {
-        DepartmentsView()
-    }
+    DepartmentsView()
 }

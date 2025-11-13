@@ -176,7 +176,7 @@ struct CrystalBallView: View {
                     }
                 }
             }
-            .navigationBarHidden(true)
+            
         }
     }
 }
