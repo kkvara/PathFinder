@@ -320,30 +320,14 @@ struct QuestionsView: View {
         VStack {
             // Header and Progress Bar
             VStack {
-                // Top Bar - Back Button
-                HStack {
-                    Button(action: goBack) {
-                        Image(systemName: "chevron.backward")
-                            .font(.title2)
-                            .padding(10)
-                            .background(
-                                Circle()
-                                    .fill(AppTheme.darkCardColor.opacity(0.8))
-                            )
-                    }
-                    .padding(.leading, 25)
-                    Spacer()
-                    
-                    // Placeholder per il bottone a destra
-                    CircleButton(systemName: "star").opacity(0.0)
-                        .padding(.trailing, 25)
-                }
-                .padding(.top, 18)
+
+                
                 
                 // Question Counter (In English)
                 HStack {
                     Text("\(currentQuestionIndex + 1) of \(questions.count)")
                         .font(.callout)
+                        .padding(.top, 10)
                         .foregroundColor(AppTheme.primaryColor)
                     Spacer()
                 }
