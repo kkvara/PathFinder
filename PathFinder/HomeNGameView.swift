@@ -2,45 +2,37 @@ import SwiftUI
 
 struct HomeNGameView: View {
     @State private var showFullLeaderboard = false
-
-    // Funzione per determinare se una review è positiva
-    private func isPositiveReview(_ text: String) -> Bool {
-        let positiveKeywords = ["good", "great", "excellent", "ottimo", "preparato", "positivo", "soddisfacente"]
-        let lowercased = text.lowercased()
-        return positiveKeywords.contains(where: lowercased.contains)
-    }
-
-    // Percentuale feedback positivi per un corso
-    private func positiveFeedbackPercentage(for course: Course) -> Double {
+    
+    // Calcola la media rating per un corso
+    private func averageRating(for course: Course) -> Double {
         guard !course.reviews.isEmpty else { return 0.0 }
-        let positiveCount = course.reviews.filter { isPositiveReview($0.text) }.count
-        return (Double(positiveCount) / Double(course.reviews.count)) * 100
+        let totalRating = course.reviews.reduce(0) { $0 + $1.rating }
+        return Double(totalRating) / Double(course.reviews.count)
     }
-
-    // Leaderboard corsi
-    private var leaderboardByFeedback: [(course: Course, positivePercent: Double)] {
+    
+    // Ordinamento corsi in base alla media rating
+    private var leaderboardByRating: [(course: Course, averageRating: Double)] {
         categoriesData.flatMap { $0.courses }
             .map { course in
-                (course: course, positivePercent: positiveFeedbackPercentage(for: course))
+                (course: course, averageRating: averageRating(for: course))
             }
-            .sorted { $0.positivePercent > $1.positivePercent }
+            .sorted { $0.averageRating > $1.averageRating }
     }
-
-    // Tutti i corsi in ordine alfabetico
+    
+    // Tutti i corsi ordinati alfabeticamente
     private var allCoursesSorted: [Course] {
         categoriesData.flatMap { $0.courses }
             .sorted { $0.name < $1.name }
     }
-
+    
     var body: some View {
         NavigationStack {
             ZStack {
                 AppTheme.backgroundGradient
                     .ignoresSafeArea()
-
+                
                 ScrollView {
                     VStack(spacing: 20) {
-                        // Crystal Ball centrale e grande
                         NavigationLink(destination: CrystalBallView()) {
                             ZStack {
                                 Circle()
@@ -55,29 +47,21 @@ struct HomeNGameView: View {
                         }
                         .padding(.top, 56)
                         .padding(.bottom, 0)
-
-                        // --- Tutto il resto identico alla HomeWGameView --- //
-
-                        // Header testuale allineato a sinistra
+                        
                         Text("PATHFINDER")
                             .font(.system(size: 34, weight: .heavy))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity, alignment: .center)
                             .shadow(color: Color.black.opacity(0.25), radius: 4, x: 0, y: 2)
-                            .padding(.bottom, 30) // aumenta questo padding
-
-                        // Titolo sezione consigliati
+                            .padding(.bottom, 30)
+                        
                         Text("Recommended Paths For You")
                             .font(.title2)
-                            .padding(.horizontal)
-                            .padding(.leading, 5)
-                            .padding(.bottom, 10)  // padding solo sotto, meno spazio verticale
                             .fontWeight(.bold)
                             .foregroundColor(.white)
+                            .padding(.horizontal)
                             .frame(maxWidth: .infinity, alignment: .leading)
-
-
-                        // ScrollView orizzontale dei corsi consigliati (identico a HomeWGameView)
+                        
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 0) {
                                 ForEach(allCoursesSorted) { course in
@@ -89,14 +73,14 @@ struct HomeNGameView: View {
                                                 .frame(width: 280, height: 160)
                                                 .cornerRadius(15)
                                                 .clipped()
-                                            
+
                                             LinearGradient(
                                                 gradient: Gradient(colors: [Color.black.opacity(0.6), Color.clear]),
                                                 startPoint: .bottom,
                                                 endPoint: .center
                                             )
                                             .cornerRadius(15)
-                                            
+
                                             Text(course.name)
                                                 .font(.headline)
                                                 .bold()
@@ -111,8 +95,7 @@ struct HomeNGameView: View {
                             }
                             .padding(.horizontal)
                         }
-
-                        // Pulsante List of Departments
+                        
                         NavigationLink(destination: DepartmentsView()) {
                             VStack(alignment: .leading, spacing: 6) {
                                 Text("List of Departments")
@@ -127,38 +110,43 @@ struct HomeNGameView: View {
                             )
                             .padding(.horizontal)
                         }
-
-                        // Classifica dinamica
+                        
                         VStack(alignment: .leading, spacing: 14) {
                             Text("Ranking of courses")
                                 .font(.title2)
                                 .fontWeight(.heavy)
                                 .foregroundColor(.white)
                                 .padding(.bottom, 8)
-
-                            ForEach(showFullLeaderboard ? leaderboardByFeedback : Array(leaderboardByFeedback.prefix(3)), id: \.course.id) { entry in
+                            
+                            ForEach(showFullLeaderboard ? leaderboardByRating : Array(leaderboardByRating.prefix(3)), id: \.course.id) { entry in
                                 HStack(spacing: 8) {
                                     ZStack {
                                         Circle()
                                             .fill(Color.blue.opacity(0.8))
                                             .frame(width: 28, height: 28)
-                                        Text("\(leaderboardByFeedback.firstIndex(where: { $0.course.id == entry.course.id })! + 1)")
+                                        Text("\(leaderboardByRating.firstIndex(where: { $0.course.id == entry.course.id })! + 1)")
                                             .font(.subheadline)
                                             .fontWeight(.bold)
                                             .foregroundColor(.white)
                                     }
-                                    Text(entry.course.name)
-                                        .foregroundColor(.white)
-                                        .font(.system(.body, design: .rounded))
-                                        .bold()
+                                    
+                                    // Nome cliccabile per aprire dettaglio corso
+                                    NavigationLink(destination: CourseDetailView(course: entry.course)) {
+                                        Text(entry.course.name)
+                                            .foregroundColor(.white)
+                                            .font(.system(.body, design: .rounded))
+                                            .bold()
+                                    }
+                                    
                                     Spacer()
-                                    Text(String(format: "%.0f%% positive feedbacks", entry.positivePercent))
+                                    
+                                    Text(String(format: "%.1f average rating", entry.averageRating))
                                         .foregroundColor(.white.opacity(0.8))
                                         .font(.system(.body, design: .rounded))
                                 }
                                 .padding(.vertical, 4)
                             }
-
+                            
                             Button(action: {
                                 withAnimation {
                                     showFullLeaderboard.toggle()
@@ -172,16 +160,14 @@ struct HomeNGameView: View {
                         }
                         .padding(.horizontal)
                         .padding(.vertical, 20)
-
+                        
                         Spacer(minLength: 20)
                     }
                 }
-                
             }
         }
     }
 }
-
 
 #Preview {
     HomeNGameView()

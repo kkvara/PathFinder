@@ -6,15 +6,7 @@ struct AppTabContainer: View {
     @State private var searchText: String = ""
     @StateObject var gameState = GameState()
 
-    var filteredNews: [News] {
-        guard !searchText.isEmpty else { return [] }
-        return allNews.filter {
-            $0.title.localizedCaseInsensitiveContains(searchText) ||
-            $0.summary.localizedCaseInsensitiveContains(searchText) ||
-            $0.content.localizedCaseInsensitiveContains(searchText)
-        }
-    }
-
+    // Filtra solo i corsi, la parte news è completamente rimossa
     var filteredCourses: [Course] {
         guard !searchText.isEmpty else { return [] }
         return categoriesData.flatMap { $0.courses }
@@ -27,6 +19,7 @@ struct AppTabContainer: View {
 
     var body: some View {
         TabView {
+            // Tab Home
             Tab("Home", systemImage: "house.fill") {
                 if gameState.hasPlayedGame {
                     HomeWGameView()
@@ -37,14 +30,12 @@ struct AppTabContainer: View {
                 }
             }
 
-            Tab("News", systemImage: "newspaper.fill") {
-                NewsView()
-            }
-
+            // Tab Likes
             Tab("Likes", systemImage: "star.fill") {
                 FavoritesView()
             }
 
+            // Tab Search ora mostra solo i corsi (niente news)
             Tab(role: .search) {
                 NavigationStack {
                     ZStack {
@@ -63,46 +54,14 @@ struct AppTabContainer: View {
                                                 resultType: "Course"
                                             )
                                         }
-                                        .listRowBackground(Color.clear) // <--- Qui
+                                        .listRowBackground(Color.clear)
                                     }
                                 }
                             }
-
-                            if !filteredNews.isEmpty {
-                                Section(header: Text("News").foregroundColor(.white)) {
-                                    ForEach(filteredNews) { news in
-                                        NavigationLink(destination: SingleNewsView(news: news)) {
-                                            SearchResultCardView(
-                                                title: news.title,
-                                                description: news.summary,
-                                                imageName: news.imageName,
-                                                resultType: "News"
-                                            )
-                                        }
-                                        .listRowBackground(Color.clear) // <--- Qui
-                                    }
-                                }
-                            }
-
-                            // Progetti disabilitati temporaneamente
-                            // if !filteredProjects.isEmpty {
-                            //     Section(header: Text("Projects").foregroundColor(.white)) {
-                            //         ForEach(filteredProjects) { project in
-                            //             NavigationLink(destination: ProjectDetailView(project: project)) {
-                            //                 SearchResultCardView(
-                            //                     title: project.name,
-                            //                     description: project.description,
-                            //                     imageName: "projectPlaceholder",
-                            //                     resultType: "Project"
-                            //                 )
-                            //             }
-                            //             .listRowBackground(Color.clear) // se usi progetti
-                            //         }
-                            //     }
-                            // }
+                            // Tutto quello che riguardava news è stato rimosso
                         }
                         .listStyle(.insetGrouped)
-                        .searchable(text: $searchText, prompt: "Search courses, news, projects...")
+                        .searchable(text: $searchText, prompt: "Search courses, projects...")
                         .scrollContentBackground(.hidden)
                     }
                 }
@@ -112,6 +71,7 @@ struct AppTabContainer: View {
     }
 }
 
+// Card di ricerca corso (identica, ma senza news)
 struct SearchResultCardView: View {
     let title: String
     let description: String
@@ -146,9 +106,8 @@ struct SearchResultCardView: View {
             Spacer()
         }
         .padding()
-        .background(Color.white.opacity(0.15))// Background azzurro pieno senza trasparenze
+        .background(Color.white.opacity(0.15)) // Sfondo trasparente
         .cornerRadius(20)
-        // Nessuna ombra
     }
 }
 
