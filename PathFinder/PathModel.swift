@@ -261,7 +261,7 @@ var categoriesData: [Category] = [
                                              longitude: 9.1905,
                                              imageName: "palazzo gravina")],
                     department: "Architecture",
-                    iconName: "house.fill"
+                    iconName: "xmark.triangle.circle.square"
                 ),
                 Course(
                     name: "Architectural Sciences",
